@@ -59,7 +59,10 @@ class NFA(FiniteAutomata):
             end_t = time.time()
             return False, (end_t - start_t)
 
-    def subset_construction(self,) -> DFA:
+    def subset_construction(self,) -> Tuple[DFA, float]:
+
+        start_t = time.time()
+
         D_states: set = set()
         D_tran = {}
         F = set()
@@ -67,21 +70,17 @@ class NFA(FiniteAutomata):
         stack = Stack()
 
         q_init = tuple(self.epsilon_closure(self.q_init))
-        print("q_init:", q_init)
         D_states.add(q_init)
         stack.push(q_init)
 
         while not stack.empty():
             T = stack.pop()
-            print("state: ", T)
             D_tran[T] = {}
             for a in self.Sigma:
                 move = self.move(T, a)
-                print(f"move {T}, {a}: ", self.move(T, a))
                 U = tuple(self.epsilon_closure(move, res=set()))
                 if U:
                     if U not in D_states: # Add new states
-                        print("U:", U)
                         D_states.add(U)
                         stack.push(U)
                         
@@ -90,12 +89,17 @@ class NFA(FiniteAutomata):
     
                     D_tran[T][a] = U
 
-        return DFA(
-            Q=D_states,
-            Sigma=self.Sigma,
-            delta=D_tran,
-            q_init=q_init,
-            F=F
+        end_t = time.time()
+
+        return (
+            DFA(
+                Q=D_states,
+                Sigma=self.Sigma,
+                delta=D_tran,
+                q_init=q_init,
+                F=F
+            ),
+            (end_t - start_t)
         )
         
 

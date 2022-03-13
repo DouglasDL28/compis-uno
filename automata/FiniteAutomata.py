@@ -22,7 +22,7 @@ class FiniteAutomata:
     def plot(self, output_file='automata.png', show=False):
         """ Plots the finite automata graph. """
 
-        G = nx.DiGraph()
+        G = nx.MultiDiGraph()
         # G.add_nodes_from(self.Q)
 
         G.add_node(self.q_init, rank=0, style="filled", fillcolor="green")

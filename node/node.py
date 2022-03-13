@@ -58,7 +58,7 @@ class Node:
     def lastpos(self) -> set:
         pass
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         pass
 
     def __str__(self) -> str:
@@ -103,7 +103,7 @@ class SymbolNode(Node):
         elif self.position is not None:
             return {self.position}
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         pass
 
 
@@ -142,7 +142,7 @@ class OrNode(Node):
     def lastpos(self) -> set:
         return self.left.lastpos().union(self.right.lastpos())
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         pass
 
 
@@ -180,9 +180,9 @@ class ConcatNode(Node):
         else:
             return self.right.lastpos()
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         for i in self.left.lastpos():
-            arr[i] = arr[i].union(self.right.firstpos())
+            followpos[i] = followpos[i].union(self.right.firstpos())
         pass
 
 
@@ -219,9 +219,9 @@ class KleeneNode(Node):
     def lastpos(self) -> set:
         return self.left.lastpos()
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         for i in self.lastpos():
-            arr[i] = arr[i].union(self.firstpos())
+            followpos[i] = followpos[i].union(self.firstpos())
 
 
 class OptionalNode(Node):
@@ -259,7 +259,7 @@ class OptionalNode(Node):
     def lastpos(self):
         return self.left.lastpos()
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         pass
 
 
@@ -296,9 +296,9 @@ class PlusNode(Node):
     def lastpos(self) -> set:
         return self.left.lastpos()
 
-    def followpos(self, arr: list):
+    def followpos(self, followpos: list):
         for i in self.lastpos():
-            arr[i] = arr[i].union(self.firstpos())
+            followpos[i] = followpos[i].union(self.firstpos())
 
 
 if __name__ == "__main__":
