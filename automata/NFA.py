@@ -31,6 +31,8 @@ class NFA(FiniteAutomata):
         
         return res
 
+    def closure_s(self, s, res:set=set()):
+        return
 
     def move(self, T, a) -> set:
         """ Set of NFA states to which there is a transition on input symbol a from some state s in T. """
@@ -45,10 +47,10 @@ class NFA(FiniteAutomata):
 
     def simulate(self, word) -> Tuple[bool, float]:
         start_t = time.time()
-        S = self.epsilon_closure(self.q_init)
+        S = self.epsilon_closure(self.q_init, res=set())
         
         for c in word:
-            S = self.epsilon_closure(self.move(S, c))
+            S = self.epsilon_closure(self.move(S, c), res=set())
         
         if len(S.intersection(self.F)) > 0:
             end_t = time.time()
@@ -71,18 +73,22 @@ class NFA(FiniteAutomata):
 
         while not stack.empty():
             T = stack.pop()
+            print("state: ", T)
             D_tran[T] = {}
             for a in self.Sigma:
-                U = tuple(self.epsilon_closure(self.move(T, a)))
-                if not U in D_states: # Add new states
-                    D_states.add(U)
-                    stack.push(U)
-                     
-                    if len(self.F.intersection(U)) > 0: # Terminals
-                        F.add(U)
-
-
-                D_tran[T][a] = U
+                move = self.move(T, a)
+                print(f"move {T}, {a}: ", self.move(T, a))
+                U = tuple(self.epsilon_closure(move, res=set()))
+                if U:
+                    if U not in D_states: # Add new states
+                        print("U:", U)
+                        D_states.add(U)
+                        stack.push(U)
+                        
+                        if len(self.F.intersection(U)) > 0: # Terminals
+                            F.add(U)
+    
+                    D_tran[T][a] = U
 
         return DFA(
             Q=D_states,

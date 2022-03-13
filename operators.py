@@ -23,7 +23,7 @@ PRECEDENCE = {
     Operators.OR: 1,
     Operators.KLEENE: 3,
     Operators.PLUS: 3,
-    Operators.OPTIONAL: 4,
+    Operators.OPTIONAL: 3,
     Operators.OPEN_PARENTHESES: 0,
     Operators.CLOSE_PARENTHESES: 0,
 }

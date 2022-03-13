@@ -23,7 +23,17 @@ class FiniteAutomata:
         """ Plots the finite automata graph. """
 
         G = nx.DiGraph()
-        G.add_nodes_from(self.Q)
+        # G.add_nodes_from(self.Q)
+
+        G.add_node(self.q_init, rank=0, style="filled", fillcolor="green")
+        self.Q.remove(self.q_init)
+
+        temp_Q = self.Q - self.F
+        G.add_nodes_from(temp_Q)
+
+        G.add_nodes_from(self.F, style="filled", fillcolor="red")
+
+        
         for node, trans in self.delta.items():
             for c, s in trans.items():
                 if isinstance(s, list):

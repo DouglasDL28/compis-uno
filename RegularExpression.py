@@ -1,5 +1,4 @@
-from re import T
-from automata.FiniteAutomata import FiniteAutomata
+from automata.DFA import DFA
 from automata.NFA import NFA
 from node.node import KleeneNode, Node, OptionalNode, PlusNode
 from node.node import SymbolNode
@@ -31,12 +30,15 @@ class RegularExpression:
     def infix_to_posfix(self, re):
         """ Returns regular expression in posfix format. """
 
+        unaryops = {"+", "*", "?"}
+        operators = OPERATORS.keys()
+        
         posfix = []
         stack = Stack()
         prev = ""
         for c in re:
             if c in self.alphabet: # operand
-                if prev in self.alphabet or prev == '*' or prev == ')': # CONCAT operator
+                if (prev in self.alphabet) or (prev in unaryops) or (prev == ')'): # CONCAT operator
                     op = Operators.CONCAT
                     while (not stack.empty()) and (PRECEDENCE[op] <= PRECEDENCE[stack.peek()]):
                         posfix.append(stack.pop()) 
@@ -44,9 +46,9 @@ class RegularExpression:
 
                 posfix.append(c)
 
-            elif c in OPERATORS.keys():
+            elif c in operators:
                 if c == '(':
-                    if prev in self.alphabet or prev == '*' or prev == ')': # CONCAT operator
+                    if (prev in self.alphabet) or (prev in unaryops) or (prev == ')'): # CONCAT operator
                         op = Operators.CONCAT
                         while (not stack.empty()) and (PRECEDENCE[op] <= PRECEDENCE[stack.peek()]):
                             posfix.append(stack.pop())
@@ -75,12 +77,21 @@ class RegularExpression:
             posfix.append(stack.pop())
 
         self.posfix = posfix
+
+        for c in posfix:
+            if isinstance(c, Operators):
+                print(c.value, end=" ")
+            else:
+                print(c, end=" ")
+        print()
+
         return posfix
 
     def Thompson(self, re):
         """ Generate NFA from regular expression. Generates expression tree. """
 
         re = self.infix_to_posfix(re)
+        print("postfix re:", re)
 
         stack = Stack()
         op_node_factory = OperatorNodeFactory()
@@ -93,6 +104,8 @@ class RegularExpression:
                 if c == Operators.KLEENE:
                     stack.push(KleeneNode(value=c, left=stack.pop(), thompson=True))
                 elif c == Operators.PLUS:
+                    stack.push(PlusNode(value=c, left=stack.pop(), thompson=True))
+                elif c == Operators.OPTIONAL:
                     stack.push(PlusNode(value=c, left=stack.pop(), thompson=True))
                 else:
                     right = stack.pop()
@@ -111,6 +124,7 @@ class RegularExpression:
         return tree
 
     def direct_construction(self, re):
+        print("alfabeto:", self.alphabet)
         self.alphabet.add("#")
         re = self.infix_to_posfix(re + "#")
         
@@ -118,10 +132,12 @@ class RegularExpression:
         op_node_factory = OperatorNodeFactory()
 
         followpos = []
+        symbol_pos_map = {a : set() for a in self.alphabet}
         
         position = 0
         for c in re:
             if c in self.alphabet:  # operand
+                symbol_pos_map[c].add(position)
                 followpos.append(set())
                 stack.push(SymbolNode(value=c, position=position, direct=True, followpos=followpos))
                 position += 1
@@ -141,10 +157,54 @@ class RegularExpression:
                     stack.push(node)
 
         print(followpos)
-        tree = stack.pop()
-        self.tree = tree
+        tree: Node = stack.pop()
 
-        return tree
+        # tree.print_tree(tree)
+
+        D_states: set = set()
+        D_tran = {}
+        F = set()
+
+        stack = Stack()
+
+        self.alphabet.remove('#')
+
+        q_init = tuple(tree.firstpos())
+        print("q_init:", q_init)
+        D_states.add(q_init)
+        stack.push(q_init)
+
+        while not stack.empty():
+            S = stack.pop()
+            D_tran[S] = {}
+
+            is_terminal = False
+            for a in self.alphabet:
+                U = set()
+                for p in S:
+                    if p in symbol_pos_map[a]:
+                        U = U.union(followpos[p])
+                    if p in symbol_pos_map["#"]:
+                        is_terminal = True
+
+                U = tuple(U)
+                if U:
+                    if U not in D_states: # Add new states
+                        D_states.add(U)
+                        stack.push(U)
+                            
+                        if is_terminal: # Terminals
+                            F.add(U)
+
+                    D_tran[S][a] = U
+
+        return DFA(
+            Q=D_states,
+            Sigma=self.alphabet,
+            delta=D_tran,
+            q_init=q_init,
+            F=F
+        )
 
     def __str__(self) -> str:
         return f"""\
@@ -154,19 +214,27 @@ FA: {self.FA}
     
 
 if __name__ == '__main__':
-    test_re = "(a|b)*abb"
-    word = "aaaabb"
+    direct = True
+    subset = False
+    test_re = "(a|b)*((a|(bb))*ε)"
+    word = "abaabbabaa"
     re = RegularExpression(test_re)
     print("test_re:", test_re)
 
-    tree = re.direct_construction(test_re)
-    tree.print_tree(tree)
-    # re.Thompson(test_re)
+    if direct:
+        tree = re.direct_construction(test_re)
+        # tree.print_tree(tree)
+        tree.plot("Directo.png")
 
-    # print(re.tree.print_tree(re.tree))
+    if subset:
+        # Thompson
+        re.Thompson(test_re)
+        print(re.tree.print_tree(re.tree))
 
-    # dfa = re.thompson_nfa.subset_construction()
-    # dfa.plot("SubsetConstruction.png", True)
+        subset_dfa = re.thompson_nfa.subset_construction()
+        subset_dfa.plot("SubsetConstruction.png", False)
+
+
 
     # val, time = re.thompson_nfa.simulate(word)
     # print("Thompson NFA:",  val)
