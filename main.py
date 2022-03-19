@@ -1,8 +1,8 @@
 from RegularExpression import RegularExpression
 
 if __name__ == "__main__":
-    re = input("Ingrese la expresión regular: ") or "(b|b)*abb(a|b)*"
-    word = input("Ingrese la palabra a evaluar: ") or "babbaaaaa"
+    re = input("Ingrese la expresión regular: ") or "(0|1)1*(0|1)"
+    word = input("Ingrese la palabra a evaluar: ") or "01111"
 
     re = RegularExpression(re)
 
