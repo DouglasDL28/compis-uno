@@ -4,6 +4,9 @@ plots/
 # DS Store
 .DS_Store
 
+# re tests
+tests.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
