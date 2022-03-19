@@ -18,6 +18,8 @@ OPERATORS = {
     '+': Operators.PLUS,
 }
 
+UNARY_OPS = {"+", "*", "?"}
+
 PRECEDENCE = {
     Operators.CONCAT: 2,
     Operators.OR: 1,
