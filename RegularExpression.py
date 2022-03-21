@@ -88,13 +88,6 @@ class RegularExpression:
 
         self.postfix = postfix
 
-        for c in postfix:
-            if isinstance(c, Operators):
-                print(c.value, end=" ")
-            else:
-                print(c, end=" ")
-        print()
-
         return postfix
 
     def Thompson(self) -> Tuple[Node, float]:
@@ -254,7 +247,7 @@ if __name__ == '__main__':
     direct = True
     subset = True
     test_re = "(0|1)1*(0|1)"
-    word = "0111111"
+    word = "0011111"
     re = RegularExpression(test_re)
     print("regular expression:", test_re)
 
