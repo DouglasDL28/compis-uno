@@ -1,7 +1,5 @@
 import re
 
-from Stack import Stack
-
 
 SPECIFICATIONS = ["COMPILER", "CHARACTERS", "KEYWORDS", "TOKENS", "PRODUCTIONS", "END"]
 
@@ -264,12 +262,10 @@ class Scanner:
                         res += '|'
 
                 self.characters[character] = '(' + res + ')'
-                print(character, self.characters[character])
 
         def preprocess_tokens():
             for token in self.tokens:
                 value = self.tokens[token]
-                print(token, value)
 
                 res = ""
                 word = ""
@@ -299,7 +295,6 @@ class Scanner:
                     
                     i += 1
 
-                print(token, res)
                 self.tokens[token] = res
 
         if expect("COMPILER"):
@@ -308,7 +303,6 @@ class Scanner:
         if expect("CHARACTERS"):
             scan_characters()
             preprocess_characters()
-            print("\n")
 
         if expect("KEYWORDS"):
             scan_keywords()
@@ -329,8 +323,7 @@ class Scanner:
             self.tokens,
             self.productions,
         )
-
-                
+         
 
 if __name__ == "__main__":
     filename = "ejemploCocol.cocoL"
