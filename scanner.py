@@ -204,6 +204,7 @@ class Scanner:
                         word = ""
                         increment_index()
                     elif char == '.':
+                        word += char
                         self.tokens[key] = word
                         key, word = "", "" # empty buffers
                         increment_index()
@@ -265,19 +266,41 @@ class Scanner:
                 self.characters[character] = '(' + res + ')'
                 print(character, self.characters[character])
 
-                
-
-                
-                            
-                    
-                    
-
-
-
-        def preprocess_keywords():
-            pass
         def preprocess_tokens():
-            pass
+            for token in self.tokens:
+                value = self.tokens[token]
+                print(token, value)
+
+                res = ""
+                word = ""
+                i = 0
+                scanning = True
+
+                while scanning:
+                    c = value[i]
+                    
+                    if c == '"':
+                        i += 1
+                        while value[i] != '"':
+                            word += value[i]
+                            i += 1
+                    elif c in {"{", "}"}:
+                        if word in self.characters:
+                            res += self.characters[word]
+                        else:
+                            res += word
+                        res += c
+                        word = ""
+                    elif c ==".":
+                        res += word
+                        break
+                    else:
+                        word += value[i]
+                    
+                    i += 1
+
+                print(token, res)
+                self.tokens[token] = res
 
         if expect("COMPILER"):
             scan_compiler()
@@ -285,10 +308,10 @@ class Scanner:
         if expect("CHARACTERS"):
             scan_characters()
             preprocess_characters()
+            print("\n")
 
         if expect("KEYWORDS"):
             scan_keywords()
-            preprocess_keywords()
         
         if expect("TOKENS"):
             scan_tokens()
@@ -299,6 +322,13 @@ class Scanner:
 
         if expect("END"):
             pass
+    
+        return (
+            self.characters,
+            self.keywords,
+            self.tokens,
+            self.productions,
+        )
 
                 
 
