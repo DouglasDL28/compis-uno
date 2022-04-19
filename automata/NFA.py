@@ -73,6 +73,9 @@ class NFA(FiniteAutomata):
         D_states.add(q_init)
         stack.push(q_init)
 
+        self.Sigma.discard('ε')
+        print("sigma:", self.Sigma)
+
         while not stack.empty():
             T = stack.pop()
             D_tran[T] = {}
@@ -89,6 +92,7 @@ class NFA(FiniteAutomata):
     
                     D_tran[T][a] = U
 
+        self.Sigma.add('ε')
         end_t = time.time()
 
         return (
