@@ -4,7 +4,6 @@ from typing import Tuple
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import graphviz as gv
 
 class FiniteAutomata:
     """ Finite Automata with the tuple: (Q, ∑, ∂, q_0, F). """

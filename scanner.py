@@ -4,13 +4,14 @@ import re
 SPECIFICATIONS = ["COMPILER", "CHARACTERS", "KEYWORDS", "TOKENS", "PRODUCTIONS", "END"]
 
 class Scanner:
-    """ CoCoL parser """
+    """ CoCoL parser. """
 
     compiler: str = ""
     characters: dict = {}
-    keywords: dict = {}
+    keywords: set = set()
     tokens: dict = {}
     productions: dict = {}
+    except_keywords: dict = {}
 
     index = 0
     line = 1
@@ -168,8 +169,16 @@ class Scanner:
                         key = word
                         word = ""
                         increment_index()
+
+                    elif char == "\"":
+                        increment_index() #ignore "
+                        while file[self.index] != "\"":
+                            word += file[self.index]
+                            increment_index()
+                        
+                        increment_index() # ignore " 
                     elif char == '.':
-                        self.keywords[key] = word
+                        self.keywords.add(word)
                         key, word = "", "" # empty buffers
                         increment_index()
 
@@ -213,6 +222,7 @@ class Scanner:
 
         def preprocess_characters():
             """ Converts character set into a valid regular expression. """
+
             for character in self.characters:
                 value = self.characters[character]
 
@@ -223,9 +233,9 @@ class Scanner:
                 while scanning:
                     c = value[i]
                     
-                    if c == '"':
+                    if c == '\"':
                         i += 1
-                        while value[i] != '"':
+                        while value[i] != '\"':
                             word += value[i]
                             i += 1
                     elif c in {"-", "+"}:
@@ -264,38 +274,88 @@ class Scanner:
                 self.characters[character] = '(' + res + ')'
 
         def preprocess_tokens():
-            for token in self.tokens:
-                value = self.tokens[token]
+            for name in self.tokens:
+                token = self.tokens[name]
 
                 res = ""
                 word = ""
                 i = 0
                 scanning = True
 
+                if token[-15: -1] == "EXCEPTKEYWORDS":
+                    token = token[0:-15] + '.'
+                    self.except_keywords[name] = True
+
+                print(token)
+
                 while scanning:
-                    c = value[i]
+                    c = token[i]
                     
-                    if c == '"':
+                    if c == '\"':
                         i += 1
-                        while value[i] != '"':
-                            word += value[i]
+                        while token[i] != '\"':
+                            word += token[i]
                             i += 1
-                    elif c in {"{", "}"}:
+                    
+                    elif c == '{':
+                        i += 1
+                        # add word previous to brakers
                         if word in self.characters:
                             res += self.characters[word]
                         else:
                             res += word
-                        res += c
-                        word = ""
+
+                        res += '(' # open Kleene
+                        word = "" # reset buffer
+
+                        # scan word inside brackets
+                        while token[i] != '}':
+                            word += token[i]
+                            i += 1
+                        
+                        # add word inside brackets
+                        if word in self.characters:
+                            res += self.characters[word]
+                        else:
+                            res += word
+                        
+                        res += ")*" # close Kleene
+                        word = "" # reset buffer
+
+                    elif c == '[':
+                        i += 1
+                        # add word previous to brakers
+                        if word in self.characters:
+                            res += self.characters[word]
+                        else:
+                            res += word
+
+                        res += '(' # open Kleene
+                        word = "" # reset buffer
+
+                        # scan word inside brackets
+                        while token[i] != ']':
+                            word += token[i]
+                            i += 1
+                        
+                        # add word inside brackets
+                        if word in self.characters:
+                            res += self.characters[word]
+                        else:
+                            res += word
+                        
+                        res += ")?" # close Kleene
+                        word = "" # reset buffer
+
                     elif c ==".":
                         res += word
-                        break
+                        scanning = False
                     else:
-                        word += value[i]
+                        word += token[i]
                     
                     i += 1
 
-                self.tokens[token] = res
+                self.tokens[name] = res
 
         if expect("COMPILER"):
             scan_compiler()
@@ -311,6 +371,12 @@ class Scanner:
             scan_tokens()
             preprocess_tokens()
 
+            # add keywords
+            for kw in self.keywords:
+                self.tokens[kw] = kw
+
+            print(self.tokens)
+
         if expect("PRODUCTIONS"):
             pass
 
@@ -322,6 +388,7 @@ class Scanner:
             self.keywords,
             self.tokens,
             self.productions,
+            self.except_keywords
         )
          
 
@@ -330,3 +397,5 @@ if __name__ == "__main__":
     scanner = Scanner(filename)
 
     scanner.scan()
+
+    print(scanner.tokens)

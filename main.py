@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     dfa.plot("Directo.png")
 
-    sim, elapsed_t  = subset_dfa.simulate(word)
+    sim, elapsed_t  = dfa.simulate(word)
     print(f"Direct Construction DFA simulation: {sim} -- elapsed time: {elapsed_t}\n")
 
 

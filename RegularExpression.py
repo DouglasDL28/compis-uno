@@ -3,7 +3,7 @@ from typing import Tuple
 
 from automata.DFA import DFA
 from automata.NFA import NFA
-from node.node import KleeneNode, Node, OptionalNode, PlusNode
+from node.node import Node
 from node.node import SymbolNode
 from Stack import Stack
 from node.node_factory import OperatorNodeFactory
@@ -139,22 +139,32 @@ class RegularExpression:
 
         return tree, (end_t - start_t)
 
-    def direct_construction(self) -> Tuple[DFA, float]:
+    def direct_construction(self, tokens: dict, keywords: dict, except_keyword: dict) -> Tuple[DFA, float]:
 
         start_t = time.time()
 
-        self.alphabet.add("#")
-        re = self.infix_to_posfix(self.re + "#")
+        re = self.infix_to_posfix(self.re)
         
         stack = Stack()
         op_node_factory = OperatorNodeFactory()
 
         followpos = []
         symbol_pos_map = {a : set() for a in self.alphabet}
-        
+        tokens_pos = {}
+
+        token_idx = 0
         position = 0
         for c in re:
-            if c in self.alphabet:  # operand
+            if c == '#': # token end symbol
+                symbol_pos_map[c].add(position)
+                tokens_pos[position] = token_idx
+                token_idx += 1
+                followpos.append(set())
+                stack.push(SymbolNode(value=c, position=position, direct=True, followpos=followpos))
+                position += 1
+
+
+            elif c in self.alphabet:  # operand
                 symbol_pos_map[c].add(position)
                 followpos.append(set())
                 stack.push(SymbolNode(value=c, position=position, direct=True, followpos=followpos))
@@ -188,6 +198,10 @@ class RegularExpression:
 
         tree: Node = stack.pop()
 
+        print("tokens:", tokens_pos)
+
+        # tree.print_tree(tree)
+
         D_states: set = set()
         D_tran = {}
         F = set()
@@ -196,9 +210,16 @@ class RegularExpression:
 
         self.alphabet.remove('#')
 
+        # print("root firstpos: \n", tree.firstpos())
+        # print("followpos: \n", followpos)
+
         q_init = tuple(tree.firstpos())
         D_states.add(q_init)
         stack.push(q_init)
+
+        # print("sybol_pos_map: \n", json.dumps(symbol_pos_map, indent=2, default=str))
+
+        token_states = [set() for i in range(len(tokens))] # array of states sets
 
         while not stack.empty():
             S = stack.pop()
@@ -210,15 +231,22 @@ class RegularExpression:
                     if p in symbol_pos_map[a]:
                         U = U.union(followpos[p])
 
+                temp_U = U
                 U = tuple(U)
+    
                 if U:
                     if U not in D_states: # Add new states
                         D_states.add(U)
                         stack.push(U)
-                            
-                        if symbol_pos_map['#'].issubset(U): # Terminals
-                            F.add(U)
+                        
+                        terminals = symbol_pos_map['#'].intersection(temp_U)
 
+                        if terminals: # check if empty
+                            for pos in terminals:
+                                idx = tokens_pos[pos]
+                                token_states[idx].add(U) # add state to token states
+
+                            F.add(U)
 
                     D_tran[S][a] = U
 
@@ -230,7 +258,11 @@ class RegularExpression:
                 Sigma=self.alphabet,
                 delta=D_tran,
                 q_init=q_init,
-                F=F
+                F=F,
+                tokens=tokens,
+                token_states=token_states,
+                keywords=keywords,
+                except_keyword=except_keyword
             ),
             end_t - start_t
         )
