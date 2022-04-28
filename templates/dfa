@@ -1,0 +1,11 @@
+def __init__(self,) -> None:
+    self.Q: set = {{ Q }}
+    self.Sigma: set = {{ Sigma }}
+    self.delta: dict = {{ delta }}
+    self.q_init = {{ q_init }}
+    self.F: set = {{ F }}
+    self.token_names: list = {{ token_names }}
+    self.token_states: list = {{ token_states }}
+    self.keywords: set = {{ keywords }}
+    self.except_keyword: dict = {{ except_keyword }}
+    self.ignore: set = {{ ignore }}

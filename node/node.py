@@ -62,7 +62,14 @@ class Node:
         pass
 
     def __str__(self) -> str:
-        val = self.value.value if isinstance(self.value, Operators) else self.value
+        val = ""
+        if isinstance(self.value, Operators):
+            val = self.value.value
+        elif isinstance(self.value, int):
+            val = chr(self.value)
+        else:
+            val = self.value
+
         # position = f" ({self.position})" if self.position else ""
         res = f"{val}"
         return res

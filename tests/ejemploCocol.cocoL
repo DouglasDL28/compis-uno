@@ -3,9 +3,12 @@ COMPILER Ejemplo
 /*--------------Scanner Specification----------*/
 .)
 CHARACTERS
-letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".
-digit = "0123456789".
+ANY = CHR(1) .. CHR(255).
+letter = "abcABC".
+digit = "012".
 hexdigit = digit+"ABCDEF".
+test = 'A' .. 'Z'.
+test2 = '@'.
 KEYWORDS
 if="if".
 while="while".
@@ -13,5 +16,6 @@ TOKENS
 id = letter{letter} EXCEPT KEYWORDS.
 number = digit{digit}.
 hexnumber = hexdigit{hexdigit}"(H)".
+IGNORE '@'
 PRODUCTIONS
-END Ejemplo
+END Ejemplo.

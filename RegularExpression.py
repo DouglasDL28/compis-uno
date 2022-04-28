@@ -13,9 +13,13 @@ from operators import Operators, OPERATORS, PRECEDENCE, UNARY_OPS
 
 class RegularExpression:
 
-    def __init__(self, re) -> None:
+    def __init__(self, re, alphabet=None, ignore=set()) -> None:
         self.re = re
-        self.alphabet: set = self.generate_alphabet(re)
+        if alphabet is not None:
+            self.alphabet: set = alphabet
+        else:
+            self.alphabet: set = self.generate_alphabet(re)
+        self.ignore = ignore
         self.tree: Node = None
         self.thompson_nfa: NFA = None
 
@@ -39,7 +43,7 @@ class RegularExpression:
         stack = Stack()
         prev = ""
         for c in re:
-            if c in self.alphabet: # operand
+            if c in self.alphabet or c == '#': # operand
                 if (prev in self.alphabet) or (prev in UNARY_OPS) or (prev == ')'): # CONCAT operator
                     op = Operators.CONCAT
                     while (not stack.empty()) and (PRECEDENCE[op] <= PRECEDENCE[stack.peek()]):
@@ -139,10 +143,11 @@ class RegularExpression:
 
         return tree, (end_t - start_t)
 
-    def direct_construction(self, tokens: dict, keywords: dict, except_keyword: dict) -> Tuple[DFA, float]:
+    def direct_construction(self, token_names: list, keywords: dict, except_keyword: dict) -> Tuple[DFA, float]:
 
         start_t = time.time()
 
+        self.alphabet.add('#')
         re = self.infix_to_posfix(self.re)
         
         stack = Stack()
@@ -198,8 +203,7 @@ class RegularExpression:
 
         tree: Node = stack.pop()
 
-        print("tokens:", tokens_pos)
-
+        # print("tokens:", tokens_pos)
         # tree.print_tree(tree)
 
         D_states: set = set()
@@ -219,7 +223,7 @@ class RegularExpression:
 
         # print("sybol_pos_map: \n", json.dumps(symbol_pos_map, indent=2, default=str))
 
-        token_states = [set() for i in range(len(tokens))] # array of states sets
+        token_states = [set() for i in range(len(token_names))] # array of states sets
 
         while not stack.empty():
             S = stack.pop()
@@ -259,10 +263,11 @@ class RegularExpression:
                 delta=D_tran,
                 q_init=q_init,
                 F=F,
-                tokens=tokens,
+                token_names=token_names,
                 token_states=token_states,
                 keywords=keywords,
-                except_keyword=except_keyword
+                except_keyword=except_keyword,
+                ignore = self.ignore
             ),
             end_t - start_t
         )
@@ -281,7 +286,7 @@ if __name__ == '__main__':
     test_re = "(0|1)1*(0|1)"
     word = "0011111"
     re = RegularExpression(test_re)
-    print("regular expression:", test_re)
+    # print("regular expression:", test_re)
 
     # Thompson
     print("--------THOMPSON--------")

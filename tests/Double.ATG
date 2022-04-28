@@ -23,4 +23,4 @@ decnumber = digit{digit}"."digit{digit}.
 white = blanco{blanco}.
 
 
-END Double
+END Double.
