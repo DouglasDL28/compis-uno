@@ -25,7 +25,7 @@ if __name__ == "__main__":
     print("PROYECTO 2")
 
     # TODO: leer archivo COCOL
-    input_file = input("Input COCOL filename: ") or "tests/CoCol.atg"
+    input_file = input("Input COCOL filename: ") or "tests/Archivo3.ATG"
 
     scanner = Scanner(input_file)
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     # print(dfa)
 
-    filename = input("Input filename: ") or "tests/test.txt"
+    filename = input("Input filename: ") or "tests/Archivo3.ATG"
     sim, elapsed_t  = dfa.simulate(filename=filename)
     print(f"Direct Construction DFA simulation: {sim} -- elapsed time: {elapsed_t}\n")
 

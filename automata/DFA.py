@@ -86,10 +86,14 @@ class DFA(FiniteAutomata):
 
                 if i == (file_len - 1): # eof
                     tokens.append(current_token)
+                    # print(current_token)
+                    current_token = None
 
                 elif not self.move(s, ord(file[i+1])): # no transition
                     lexeme = ""
                     tokens.append(current_token)
+                    # print(current_token)
+                    current_token = None
                     s = self.q_init # restart dfa
                 
                 i += 1
@@ -98,14 +102,19 @@ class DFA(FiniteAutomata):
                 # no transition or eof
                 if i == (file_len - 1) or not self.move(s, ord(file[i+1])):
                     print("Lexical error.", file[i])
-                    i += 1
+                    if current_token:
+                        tokens.append(current_token)
+                        # print(current_token)
+                        current_token = None
+                    lexeme = "" # empty buffer
                     s = self.q_init # restart dfa
+                    i += 1
 
-                else:
+                else: 
                     lexeme += file[i]
                     i += 1
 
-        print("eof")
+        print("EOF")
 
         print(*tokens, sep='\n')
 
