@@ -74,7 +74,6 @@ class Node:
         res = f"{val}"
         return res
 
-
 #Symbol, Concat, Plus, Optional, Or, Kleene
 class SymbolNode(Node):
     def thompson(self):
@@ -113,7 +112,6 @@ class SymbolNode(Node):
     def followpos(self, followpos: list):
         pass
 
-
 class OrNode(Node):
     def thompson(self,):
         left = self.left.fa
@@ -151,7 +149,6 @@ class OrNode(Node):
 
     def followpos(self, followpos: list):
         pass
-
 
 class ConcatNode(Node):
     def thompson(self,):
@@ -192,7 +189,6 @@ class ConcatNode(Node):
             followpos[i] = followpos[i].union(self.right.firstpos())
         pass
 
-
 class KleeneNode(Node):
     def thompson(self,):
         left = self.left.fa
@@ -229,7 +225,6 @@ class KleeneNode(Node):
     def followpos(self, followpos: list):
         for i in self.lastpos():
             followpos[i] = followpos[i].union(self.firstpos())
-
 
 class OptionalNode(Node):
     """ (a|b) """
@@ -268,7 +263,6 @@ class OptionalNode(Node):
 
     def followpos(self, followpos: list):
         pass
-
 
 class PlusNode(Node):
     def thompson(self,):

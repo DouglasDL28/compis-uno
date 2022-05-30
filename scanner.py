@@ -1,4 +1,3 @@
-from select import kevent
 import string
 
 LETTER = set(string.ascii_letters)
@@ -409,7 +408,7 @@ class Scanner:
             elif c == '\'': # char
                 self.increment_index()
                 symbol += '('
-                symbol = ord(self.file[self.index])
+                symbol.append(ord(self.file[self.index]))
                 self.alphabet.add(ord(self.file[self.index]))
                 symbol += ')'
                 self.increment_index()
@@ -578,7 +577,7 @@ class Scanner:
          
 
 if __name__ == "__main__":
-    filename = "tests/ejemploCocol.cocoL"
+    filename = "tests/Archivo3.ATG"
     scanner = Scanner(filename)
 
     scanner.scan()

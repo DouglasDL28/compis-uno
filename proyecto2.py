@@ -4,7 +4,7 @@ from scanner import Scanner
 from RegularExpression import RegularExpression as RE
 
 
-def generate_file(filename, data):
+def generate_file(filename, template_file, data):
     # Use Jinja2 with templates and data dict to generate the html file.
     templateLoader = jinja2.FileSystemLoader(searchpath='templates/')
     env = jinja2.Environment(
@@ -17,7 +17,7 @@ def generate_file(filename, data):
         loader=templateLoader
     )
 
-    template = env.get_template("template.txt").stream(data)
+    template = env.get_template(template_file).stream(data)
     template.dump(filename)
     
 
@@ -55,10 +55,12 @@ if __name__ == "__main__":
     # print(dfa)
 
     filename = input("Input filename: ") or "tests/Archivo3.ATG"
-    sim, elapsed_t  = dfa.simulate(filename=filename)
+    sim, tokens, elapsed_t  = dfa.simulate(filename=filename)
     print(f"Direct Construction DFA simulation: {sim} -- elapsed time: {elapsed_t}\n")
 
-    generate_file(filename="lex.py", data={
+    print(*tokens, sep='\n')
+
+    generate_file(filename="lex.py", template_file="scanner.txt", data={
         "F": dfa.F,
         "delta": dfa.delta,
         "Q": dfa.Q,

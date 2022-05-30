@@ -1,8 +1,16 @@
 import time
 from typing import Tuple
+from unicodedata import name
 
 from automata.FiniteAutomata import FiniteAutomata
 
+class Token():
+    def __init__(self, name, lexeme) -> None:
+        self.name = name
+        self.lexeme = lexeme
+
+    def __str__(self) -> str:
+        return f"<{self.name}, '{self.lexeme}'>"
 
 class DFA(FiniteAutomata):
     """ Deterministic Finite Automata. Inherits from FiniteAutomata. """
@@ -78,9 +86,9 @@ class DFA(FiniteAutomata):
                         token = self.token_names[j]
                         if (token in self.except_keyword
                             and lexeme in self.get_keywords_set()):
-                            current_token = (lexeme, lexeme) # keyword
+                            current_token = Token(lexeme, lexeme) # keyword
                         else:
-                            current_token = (token, lexeme) # token
+                            current_token = Token(token, lexeme) # token
 
                         break
 
@@ -114,12 +122,8 @@ class DFA(FiniteAutomata):
                     lexeme += file[i]
                     i += 1
 
-        print("EOF")
-
-        print(*tokens, sep='\n')
-
         end_t = time.time()
-        return True, (end_t - start_t)
+        return True, tokens, (end_t - start_t)
 
 if __name__ == "__main__":
     dfa = DFA(Q=[], Sigma=[], delta=[], q_init="a", F=[])

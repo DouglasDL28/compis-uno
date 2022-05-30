@@ -1,8 +1,8 @@
 COMPILER MyCOCOR
-(.//Especificacion de Funciones.)
+
 CHARACTERS
 
-ANY = CHR(1)..CHR(255).
+ANY = CHR(0)..CHR(255).
 letter= "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz".
 digit= "0123456789".
 
@@ -20,7 +20,7 @@ TOKENS
 
 ident = letter{letter|digit} EXCEPT KEYWORDS.
 string = comillas stringletter{stringletter} comillas.
-
+a = 'a'.
 char = "'"["/"]letter"'".
 charnumber = "CHR("digit{digit}")".
 charinterval = "CHR("digit{digit}")""..""CHR("digit{digit}")".

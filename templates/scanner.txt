@@ -3,7 +3,15 @@ from typing import Tuple
 
 from automata.FiniteAutomata import FiniteAutomata
 
-class DFA(FiniteAutomata):
+class Token():
+    def __init__(self, name, lexeme) -> None:
+        self.name: str = name
+        self.lexeme: str = lexeme
+
+    def __str__(self) -> str:
+        return f"<{self.name}, '{self.lexeme}'>"
+
+class Scanner(FiniteAutomata):
     """ Deterministic Finite Automata. Inherits from FiniteAutomata. """
 
     def __init__(self,) -> None:
@@ -68,9 +76,11 @@ class DFA(FiniteAutomata):
                         token = self.token_names[j]
                         if (token in self.except_keyword
                             and lexeme in self.get_keywords_set()):
-                            current_token = (lexeme, lexeme) # keyword
+                            current_token = Token(lexeme, lexeme) # keyword
                         else:
-                            current_token = (token, lexeme) # token
+                            current_token = Token(token, lexeme) # token
+
+                        last_idx = i
 
                         break
 
@@ -98,25 +108,23 @@ class DFA(FiniteAutomata):
                         current_token = None
                     lexeme = "" # empty buffer
                     s = self.q_init # restart dfa
-                    i += 1
+                    i = last_idx + 1
 
                 else: 
                     lexeme += file[i]
                     i += 1
 
-        print("EOF")
-
-        print(*tokens, sep='\n')
-
         end_t = time.time()
-        return True, (end_t - start_t)
+        return True, tokens, (end_t - start_t)
 
 
 if __name__ == "__main__":
-    dfa = DFA()
+    dfa = Scanner()
 
-    filename = input("Input filename: ") or "tests/test.txt"
+    filename = input("Input filename: ") or "tests/scan.txt"
 
-    sim, elapsed_t  = dfa.simulate(filename=filename)
+    sim, tokens, elapsed_t  = dfa.simulate(filename=filename)
     print(f"Direct Construction DFA simulation: {sim} -- elapsed time: {elapsed_t}\n")
+
+    print(*tokens, sep='\n')
 

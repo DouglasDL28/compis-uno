@@ -57,7 +57,8 @@ class Scanner(FiniteAutomata):
 
         s = self.q_init
         i = 0
-
+        last_idx = 0
+        
         while (i <= file_len - 1):
             
             # IGNORE SET
@@ -77,8 +78,10 @@ class Scanner(FiniteAutomata):
                         if (token in self.except_keyword
                             and lexeme in self.get_keywords_set()):
                             current_token = Token(lexeme, lexeme) # keyword
+                            last_idx = i
                         else:
                             current_token = Token(token, lexeme) # token
+                            last_idx = i
 
                         break
 
@@ -106,7 +109,7 @@ class Scanner(FiniteAutomata):
                         current_token = None
                     lexeme = "" # empty buffer
                     s = self.q_init # restart dfa
-                    i += 1
+                    i = last_idx + 1
 
                 else: 
                     lexeme += file[i]
@@ -119,7 +122,7 @@ class Scanner(FiniteAutomata):
 if __name__ == "__main__":
     dfa = Scanner()
 
-    filename = input("Input filename: ") or "tests/test.txt"
+    filename = input("Input filename: ") or "tests/scan.txt"
 
     sim, tokens, elapsed_t  = dfa.simulate(filename=filename)
     print(f"Direct Construction DFA simulation: {sim} -- elapsed time: {elapsed_t}\n")

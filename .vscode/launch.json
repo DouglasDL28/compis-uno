@@ -1,0 +1,52 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Proyecto",
+            "type": "python",
+            "request": "launch",
+            "program": "proyecto3.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Aritmetica",
+            "type": "python",
+            "request": "launch",
+            "module": "Aritmetica.compiler",
+            "justMyCode": true
+        },
+        {
+            "name": "MyCOCOR lexer",
+            "type": "python",
+            "request": "launch",
+            "module": "MyCOCOR.lexer",
+            "justMyCode": true
+        },
+        {
+            "name": "Double",
+            "type": "python",
+            "request": "launch",
+            "module": "Double.compiler",
+            "justMyCode": true
+        },
+        {
+            "name": "MyCOCOR",
+            "type": "python",
+            "request": "launch",
+            "module": "MyCOCOR.compiler",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

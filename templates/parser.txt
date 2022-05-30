@@ -1,0 +1,30 @@
+from scan import Token 
+
+
+token_stream: list[Token] = []
+la: Token = None
+
+def syn_error():
+    print("Syntax error")
+
+def expect(token):
+    if token == la:
+        la = token_stream.pop(0)
+    else:
+        syn_error()
+
+def get():
+    return token_stream.pop(0)
+
+def parse(token_stream):
+    token_stream = token_stream
+    la = get()
+
+    {{init_prod}}
+
+{% for f in functions %}
+{{ f }}
+{% endfor %}
+
+
+    

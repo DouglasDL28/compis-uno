@@ -1,0 +1,47 @@
+COMPILER Aritmetica    
+
+CHARACTERS 
+
+ANY = CHR(0) .. CHR(255).
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789".
+tab = CHR(9).
+eol = CHR(10).
+blanco=eol+CHR(13)+tab.
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+number = digit{digit}.
+white = blanco{blanco}.
+
+
+PRODUCTIONS
+
+Expr= {Stat ";"{white}}{white}".".
+
+Stat = 							(. value = 0; .)
+	Expression<value>		(. print(str(value)); .)
+	.
+
+Expression<$result result> =		(. result1,result2 = 0, 0; .)
+	Term<result1>
+	{    "+"Term< result2>		(. result1+=result2; .)
+	   | "-"Term< result2>		(. result1-=result2; .)
+	}							(.result=result1;.)
+	.
+
+Term<$result result>=				(.result1,result2 = 0, 0;.)
+	Factor<result1>
+	{    "*"Factor<result2>	(.result1*=result2;.)
+	   | "/"Factor<result2>	(.result1/=result2;.)
+	}							(.result=result1;.)
+	.
+	
+Factor<$result result> =	(.signo=1;.)
+	["-"(.signo = -1;.)]
+	( Number<result> | "("Expression< result>")") (.result*=signo;.).
+	
+Number<$result result> =  number (. result = int(self.t.lexeme).).
+
+END Aritmetica.
